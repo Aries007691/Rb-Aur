@@ -9,3 +9,6 @@ Change all the locations in the config to your desired location
 Insert your discord webhook in the Config.lua
 
 that's it
+
+For anny support join our discord 
+https://discord.gg/NKRCs68wC6
