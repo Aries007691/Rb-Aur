@@ -1,6 +1,6 @@
 Config = {}
 
-Config.WebhookUrl = "https://discord.com/api/webhooks/1086338212949151794/cWUglcAP3lVCU64oKtiUgzQZNm3pEseiA0BTfe841ZNreAjYtJxKO2eIaNpuOuhef5ky"
+Config.WebhookUrl = "YOUR WEBHOOK HERE"
 
 Config.discount = 0.75 -- Percent that is deducted from the car price 10%
 
