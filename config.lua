@@ -8,7 +8,10 @@ Config.pickupblip = vector3(-1327.479736328, -86.045326232910, 49.31)
 
 Config.carspawn = vector4(-1327.479736328, -86.045326232910, 49.31, 92.29) ----- Same as pickupblip
 
-Config.deliveryblip = vector3(-31.37, -1089.87, 26.42)  ----- Also the delivery location
+Config.deliveryblip = {
+    vector3(-31.37, -1089.87, 26.42), -- PDM delivery location
+    vector3(-1637.95, -3102.1, 13.94), -- AIR delivery location
+}
 
 -----------------------------------------------------------------------------
 Config.UsingTarget = GetConvar('UseTarget', 'false') == 'true'
@@ -48,6 +51,9 @@ Config.Shops = {
         ['ReturnLocation'] = vector3(-44.74, -1082.58, 26.68), -- Location to return vehicle, only enables if the vehicleshop has a job owned
         ['VehicleSpawn'] = vector4(-56.79, -1109.85, 26.43, 71.5), -- Spawn location when vehicle is bought
         ['TestDriveSpawn'] = vector4(-56.79, -1109.85, 26.43, 71.5), -- Spawn location for test drive
+        ['spawn'] = vector3(-71.76, -1087.29, 26.68), -- Spawn location for STOCK BOUGHT
+        ['pickupblip'] = vector3(-71.76, -1087.29, 26.68), -- BLIP location for PICKUPBLIP (SAME AS SPAWN COORDS)
+        ['deliveryblip'] = vector3(-31.55, -1090.45, 26.09), -- BLIP location AND DELIVERY location
         ['ShowroomVehicles'] = {
             [1] = {
                 coords = vector4(-45.65, -1093.66, 25.44, 69.5), -- where the vehicle will spawn on display
@@ -118,6 +124,9 @@ Config.Shops = {
         ['Location'] = vector3(-1255.6, -361.16, 36.91),
         ['ReturnLocation'] = vector3(-1231.46, -349.86, 37.33),
         ['VehicleSpawn'] = vector4(-1231.46, -349.86, 37.33, 26.61),
+        ['spawn'] = vector3(-1243.8, -327.81, 37.21), -- Spawn location for STOCK BOUGHT
+        ['pickupblip'] = vector3(-1243.8, -327.81, 37.21), -- BLIP location for PICKUPBLIP (SAME AS SPAWN COORDS)
+        ['deliveryblip'] = vector3(-1248.83, -357.93, 36.91), -- BLIP location AND DELIVERY location
         ['TestDriveSpawn'] = vector4(-1232.81, -347.99, 37.33, 23.28), -- Spawn location for test drive
         ['ShowroomVehicles'] = {
             [1] = {
@@ -175,6 +184,9 @@ Config.Shops = {
         ['ReturnLocation'] = vector3(-714.34, -1343.31, 0.0), -- Location to return vehicle, only enables if the vehicleshop has a job owned
         ['VehicleSpawn'] = vector4(-727.87, -1353.1, -0.17, 137.09), -- Spawn location when vehicle is bought
         ['TestDriveSpawn'] = vector4(-722.23, -1351.98, 0.14, 135.33), -- Spawn location for test drive
+        ['spawn'] = vector3(-768.9, -1378.7, 0.4), -- Spawn location for STOCK BOUGHT
+        ['pickupblip'] = vector3(-768.9, -1378.7, 0.4), -- BLIP location for PICKUPBLIP (SAME AS SPAWN COORDS)
+        ['deliveryblip'] = vector3(-749.94, -1354.6, 1.55), -- BLIP location AND DELIVERY location
         ['ShowroomVehicles'] = {
             [1] = {
                 coords = vector4(-727.05, -1326.59, 0.00, 229.5), -- where the vehicle will spawn on display
@@ -220,6 +232,9 @@ Config.Shops = {
         ['Location'] = vector3(-1652.76, -3143.4, 13.99), -- Blip Location
         ['ReturnLocation'] = vector3(-1628.44, -3104.7, 13.94), -- Location to return vehicle, only enables if the vehicleshop has a job owned
         ['VehicleSpawn'] = vector4(-1617.49, -3086.17, 13.94, 329.2), -- Spawn location when vehicle is bought
+        ['spawn'] = vector3(-1738.28, -3048.66, 13.82), -- Spawn location for STOCK BOUGHT
+        ['pickupblip'] = vector3(-1738.28, -3048.66, 13.82), -- BLIP location for PICKUPBLIP (SAME AS SPAWN COORDS)
+        ['deliveryblip'] = vector3(-1642.55, -3105.58, 13.62), -- Spawn location for PICKUPBLIP (SAME AS SPAWN COORDS)
         ['TestDriveSpawn'] = vector4(-1625.19, -3103.47, 13.94, 330.28), -- Spawn location for test drive
         ['ShowroomVehicles'] = {
             [1] = {
@@ -270,6 +285,9 @@ Config.Shops = {
         ['Location'] = vector3(900.47, -1155.74, 25.16), -- Blip Location
         ['ReturnLocation'] = vector3(900.47, -1155.74, 25.16), -- Location to return vehicle, only enables if the vehicleshop has a job owned
         ['VehicleSpawn'] = vector4(909.35, -1181.58, 25.55, 177.57), -- Spawn location when vehicle is bought
+        ['spawn'] = vector3(908.55, -1175.22, 25.38), -- Spawn location for STOCK BOUGHT
+        ['pickupblip'] =vector3(908.55, -1175.22, 25.38), -- BLIP location for PICKUPBLIP (SAME AS SPAWN COORDS)
+        ['deliveryblip'] = vector3(892.3, -1167.34, 25.03), -- BLIP location AND DELIVERY location
         ['TestDriveSpawn'] = vector4(867.65, -1192.4, 25.37, 95.72), -- Spawn location for test drive
         ['ShowroomVehicles'] = {
             [1] = {
