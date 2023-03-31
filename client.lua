@@ -448,7 +448,7 @@ function createManagedShop(shopShape, name)
                                 event = 'qb-vehicleshop:client:openCustomFinance',
                                 args = {
                                     price = getVehPrice(),
-                                    vehicle = Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle,
+                                    vehicle = Config.Shops[insideShop] and Config.Shops[insideShop]["ShowroomVehicles"] and Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle] and Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle or nil,
                                     stock = carstock
                                 }
                             },
