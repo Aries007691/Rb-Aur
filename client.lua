@@ -392,11 +392,27 @@ function createManagedShop(shopShape, name)
             CreateThread(function()
                 while insideShop and PlayerData.job and PlayerData.job.name == Config.Shops[name]['Job'] do
                     setClosestShowroomVehicle()
+                    local carstock = nil
+                    local chosenVehicle = Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle]
+                    if chosenVehicle then -- add this check to make sure chosenVehicle is not nil
+                        QBCore.Functions.TriggerCallback('qb-vehicleshop:server:checkstock', function(stock)
+                            if stock then
+                                for _, v in pairs(stock) do
+                                    if chosenVehicle.chosenVehicle == v.car then
+                                        carstock = v.stock
+                                    end
+                                end
+                            end
+                        end)
+                        while carstock == nil do
+                            Wait(10)
+                        end
                     vehicleMenu = {
                         {
                             isMenuHeader = true,
                             icon = "fa-solid fa-circle-info",
                             header = getVehBrand():upper() .. ' ' .. getVehName():upper() .. ' - $' .. getVehPrice(),
+                            txt = "Stock: " .. carstock
                         },
                         {
                             header = Lang:t('menus.test_header'),
@@ -405,7 +421,7 @@ function createManagedShop(shopShape, name)
                             params = {
                                 event = 'qb-vehicleshop:client:openIdMenu',
                                 args = {
-                                    vehicle = Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle,
+                                    vehicle = Config.Shops[insideShop] and Config.Shops[insideShop]["ShowroomVehicles"] and Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle] and Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle or nil,
                                     type = 'testDrive'
                                 }
                             }
@@ -417,10 +433,12 @@ function createManagedShop(shopShape, name)
                             params = {
                                 event = 'qb-vehicleshop:client:openIdMenu',
                                 args = {
-                                    vehicle = Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle,
-                                    type = 'sellVehicle'
+                                    vehicle = Config.Shops[insideShop] and Config.Shops[insideShop]["ShowroomVehicles"] and Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle] and Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle or nil,
+                                    type = 'sellVehicle',
+                                    stock = carstock
                                 }
-                            }
+                            },
+                            disabled = carstock <= 0
                         },
                         {
                             header = Lang:t('menus.finance_header'),
@@ -430,9 +448,11 @@ function createManagedShop(shopShape, name)
                                 event = 'qb-vehicleshop:client:openCustomFinance',
                                 args = {
                                     price = getVehPrice(),
-                                    vehicle = Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle
+                                    vehicle = Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle,
+                                    stock = carstock
                                 }
-                            }
+                            },
+                            disabled = carstock <= 0
                         },
                         {
                             header = Lang:t('menus.swap_header'),
@@ -440,10 +460,27 @@ function createManagedShop(shopShape, name)
                             icon = "fa-solid fa-arrow-rotate-left",
                             params = {
                                 event = 'qb-vehicleshop:client:vehCategories',
-                            }
-                        },
-                    }
-                    Wait(1000)
+                                }
+                            },
+                        }
+                        if QBCore.Functions.GetPlayerData().job.name == "cardealer" then
+                            table.insert(vehicleMenu, {
+                                header = Lang:t('menus.buy_stock'),
+                                txt = Lang:t('menus.buy_stock_txt'),
+                                icon = "fa-solid fa-envelope",
+                                params = {
+                                    isServer = true,
+                                    event = 'qb-vehicleshop:server:buy-stock',
+                                    args = {
+                                        buyVehicle = Config.Shops[insideShop] and Config.Shops[insideShop]["ShowroomVehicles"] and Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle] and Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle or nil,
+                                    }
+                                },
+                                disabled = not (QBCore.Functions.GetPlayerData().job.name == "cardealer") -- replace "your_job_name" with the name of your job
+                            })
+                        end
+                    else
+                        Wait(1000) -- wait for a second and try again
+                    end
                 end
             end)
         else
@@ -866,7 +903,10 @@ RegisterNetEvent('qb-vehicleshop:client:financePayment', function(data)
     end
 end)
 
-RegisterNetEvent('qb-vehicleshop:client:openIdMenu', function(data)
+RegisterNetEvent('qb-vehicleshop:client:openIdMenu', function(data, stock)
+    local vehicle = data.vehicle
+    local type = data.type
+    local stock = data.stock
     local dialog = exports['qb-input']:ShowInput({
         header = QBCore.Shared.Vehicles[data.vehicle]["name"],
         submitText = Lang:t('menus.submit_text'),
@@ -882,9 +922,10 @@ RegisterNetEvent('qb-vehicleshop:client:openIdMenu', function(data)
     if dialog then
         if not dialog.playerid then return end
         if data.type == 'testDrive' then
-            TriggerServerEvent('qb-vehicleshop:server:customTestDrive', data.vehicle, dialog.playerid)
+            TriggerServerEvent('qb-vehicleshop:server:customTestDrive', data.vehicle, dialog.playerid, data.stock)
         elseif data.type == 'sellVehicle' then
-            TriggerServerEvent('qb-vehicleshop:server:sellShowroomVehicle', data.vehicle, dialog.playerid)
+            print(stock)
+            TriggerServerEvent('qb-vehicleshop:server:sellShowroomVehicle', data.vehicle, dialog.playerid, data.stock)
         end
     end
 end)
@@ -914,14 +955,15 @@ local pickupblip = nil
 
 
 RegisterCommand('setstock', function()
-    TriggerServerEvent('qb-vehicleshop:server:updatestock')
+    TriggerServerEvent('qb-stock:server:updatestock')
 end)
 
 RegisterNetEvent('qb-vehicleshop:client:create_blip', function(vehicle)
     onmission = true
     ccarid = k
-    local coords = Config.pickupblip
-        pickupblip = AddBlipForCoord(vector3(coords.x,coords.y,coords.z))
+    local shopData = Config.Shops[insideShop]['pickupblip']
+    local coords = vector3(shopData.x, shopData.y, shopData.z)
+        pickupblip = AddBlipForCoord(vector3(shopData.x,shopData.y,shopData.z))
         SetBlipSprite(pickupblip, 1)
         SetBlipDisplay(pickupblip, 2)
         SetBlipScale(pickupblip, 1.0)
@@ -933,21 +975,25 @@ RegisterNetEvent('qb-vehicleshop:client:create_blip', function(vehicle)
     ondelivery = true
     plate = splate
     TriggerEvent("qb-vehicleshop:client:buystock", vehicle)
-    TriggerEvent("qb-vehicleshop:client:checkdistance")
-   
+    TriggerEvent("qb-vehicleshop:client:checkdistance", coords, k, insideShop)
 end)
 
 
 ------------ vehicle pickup
 CreateThread(function()
-    RegisterNetEvent('qb-vehicleshop:client:checkdistance', function(coords, k)
+    RegisterNetEvent('qb-vehicleshop:client:checkdistance', function(coords, k, shop)
+        local ondelivery = true
         while ondelivery do
             Citizen.Wait(1)
-            local pos = GetEntityCoords(PlayerPedId(), true)
-            local coords = Config.pickupblip
-            if #(pos - vector3(coords.x,coords.y,coords.z)) < 5 then
+            local playerPed = PlayerPedId()
+            if not DoesEntityExist(playerPed) then return end -- Check if the playerPed is valid
+            local pos = GetEntityCoords(playerPed)
+            local pickupCoords = vector3(coords.x, coords.y, coords.z)
+            print('pos:', pos)
+            print('pickupCoords:', pickupCoords)
+            if Vdist(pos, pickupCoords) < 5 then
                 TriggerEvent('qb-vehicleshop:client:removeblip')
-                TriggerEvent('qb-vehicleshop:client:create_delevery_blip', k)
+                TriggerEvent('qb-vehicleshop:client:create_delevery_blip', k, shop)
                 ondelivery = false
                 dropoff = true
                 break
@@ -955,7 +1001,6 @@ CreateThread(function()
         end
     end)
 end)
-
 
 ------------ Blip for delevery 
 CreateThread(function()
@@ -983,33 +1028,33 @@ end)
 
 local spawnedcar = nil
 
-RegisterNetEvent('qb-vehicleshop:client:buystock', function(vehicle)
-    RequestModel(vehicle)
-    while not HasModelLoaded(vehicle) do
-        Wait(1)
-    end
-    local veh = CreateVehicle(
-		vehicle,
-		Config.carspawn.x,      -- X
-		Config.carspawn.y,      -- Y
-		Config.carspawn.z,      -- Z
-		0,                      -- H
-		true,
-		true
-    )
-    PlayerData = QBCore.Functions.GetPlayerData()
-    local citizenid = PlayerData.citizenid
-        spawnedcar = vehicle
-        local src = source
-        SetEntityAsMissionEntity(veh, true, true)
-        local plate = GetVehicleNumberPlateText(veh)
-        while not plate do
+    RegisterNetEvent('qb-vehicleshop:client:buystock', function(vehicle)
+        RequestModel(vehicle)
+        while not HasModelLoaded(vehicle) do
             Wait(1)
         end
-        purchasedvehicle = plate
-        TriggerServerEvent('qb-vehiclekeys:server:AcquireVehicleKeys',plate)
+        local shopData = Config.Shops[insideShop]
+        local veh = CreateVehicle(
+            vehicle,
+            shopData['spawn'].x,
+            shopData['spawn'].y,
+            shopData['spawn'].z,
+            0,
+            true,
+            true
+        )
+        PlayerData = QBCore.Functions.GetPlayerData()
+        local citizenid = PlayerData.citizenid
+            spawnedcar = vehicle
+            local src = source
+            SetEntityAsMissionEntity(veh, true, true)
+            local plate = GetVehicleNumberPlateText(veh)
+            while not plate do
+                Wait(1)
+            end
+            purchasedvehicle = plate
+            TriggerServerEvent('qb-vehiclekeys:server:AcquireVehicleKeys',plate)
     end)
-
 
 
 RegisterNetEvent('qb-vehicleshop:client:removeblip', function(data)
@@ -1023,11 +1068,11 @@ RegisterNetEvent('qb-vehicleshop:client:removedeleveryblip', function(data)
 end)
 
 
-RegisterNetEvent('qb-vehicleshop:client:create_delevery_blip', function(k)
+RegisterNetEvent('qb-vehicleshop:client:create_delevery_blip', function(k, shop)
     onmission = true
     ccarid = k
-    local coords = Config.deliveryblip
-        deliveryBlip = AddBlipForCoord(vector3(coords.x,coords.y,coords.z))
+    local coords = Config.Shops[shop]['deliveryblip'] -- get the delivery blip coordinates for the current shop
+    deliveryBlip = AddBlipForCoord(coords) -- create the blip at the delivery location
         SetBlipSprite(deliveryBlip, 1)
         SetBlipDisplay(deliveryBlip, 2)
         SetBlipScale(deliveryBlip, 1.0)
@@ -1041,7 +1086,6 @@ RegisterNetEvent('qb-vehicleshop:client:create_delevery_blip', function(k)
     svehicle = vehicle
     TriggerEvent('qb-vehicleshop:client:checkdeleverydistance',coords, k)
 end)
-
 
 
 RegisterNetEvent('qb-vehicleshop:client:addtostock', function(data, vehicle, svehicle)
