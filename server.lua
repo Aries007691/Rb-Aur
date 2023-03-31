@@ -476,9 +476,14 @@ RegisterNetEvent('qb-vehicleshop:server:financeVehicle', function(downPayment, p
 end)
 
 -- Sell vehicle to customer
-RegisterNetEvent('qb-vehicleshop:server:sellShowroomVehicle', function(data, playerid)
+RegisterNetEvent('qb-vehicleshop:server:sellShowroomVehicle', function(data, playerid, stock)
     local src = source
     local player = QBCore.Functions.GetPlayer(src)
+    local stock = tonumber(stock)
+    if stock == nil or stock < 1 then
+        TriggerClientEvent('QBCore:Notify', src, 'Out of stock', 'error')
+        return
+    end
     local target = QBCore.Functions.GetPlayer(tonumber(playerid))
 
     if not target then
@@ -506,6 +511,7 @@ RegisterNetEvent('qb-vehicleshop:server:sellShowroomVehicle', function(data, pla
                 'pillboxgarage',
                 0
             })
+            MySQL.execute('UPDATE vehicle_stock SET stock = ? WHERE car = ?', { stock - 1, vehicle })
             TriggerClientEvent('qb-vehicleshop:client:buyShowroomVehicle', target.PlayerData.source, vehicle, plate)
             target.Functions.RemoveMoney('cash', vehiclePrice, 'vehicle-bought-in-showroom')
             player.Functions.AddMoney('bank', commission)
@@ -523,6 +529,7 @@ RegisterNetEvent('qb-vehicleshop:server:sellShowroomVehicle', function(data, pla
                 'pillboxgarage',
                 0
             })
+            MySQL.execute('UPDATE vehicle_stock SET stock = ? WHERE car = ?', { stock - 1, vehicle })
             TriggerClientEvent('qb-vehicleshop:client:buyShowroomVehicle', target.PlayerData.source, vehicle, plate)
             target.Functions.RemoveMoney('bank', vehiclePrice, 'vehicle-bought-in-showroom')
             player.Functions.AddMoney('bank', commission)
@@ -538,9 +545,14 @@ RegisterNetEvent('qb-vehicleshop:server:sellShowroomVehicle', function(data, pla
 end)
 
 -- Finance vehicle to customer
-RegisterNetEvent('qb-vehicleshop:server:sellfinanceVehicle', function(downPayment, paymentAmount, vehicle, playerid)
+RegisterNetEvent('qb-vehicleshop:server:sellfinanceVehicle', function(downPayment, paymentAmount, vehicle, playerid, stock)
     local src = source
     local player = QBCore.Functions.GetPlayer(src)
+    local stock = tonumber(stock)
+    if stock == nil or stock < 1 then
+        TriggerClientEvent('QBCore:Notify', src, 'Out of stock', 'error')
+        return
+    end
     local target = QBCore.Functions.GetPlayer(tonumber(playerid))
 
     if not target then
@@ -579,6 +591,7 @@ RegisterNetEvent('qb-vehicleshop:server:sellfinanceVehicle', function(downPaymen
                 paymentAmount,
                 timer
             })
+            MySQL.execute('UPDATE vehicle_stock SET stock = ? WHERE car = ?', { stock - 1, vehicle })
             TriggerClientEvent('qb-vehicleshop:client:buyShowroomVehicle', target.PlayerData.source, vehicle, plate)
             target.Functions.RemoveMoney('cash', downPayment, 'vehicle-bought-in-showroom')
             player.Functions.AddMoney('bank', commission)
@@ -600,6 +613,7 @@ RegisterNetEvent('qb-vehicleshop:server:sellfinanceVehicle', function(downPaymen
                 paymentAmount,
                 timer
             })
+            MySQL.execute('UPDATE vehicle_stock SET stock = ? WHERE car = ?', { stock - 1, vehicle })
             TriggerClientEvent('qb-vehicleshop:client:buyShowroomVehicle', target.PlayerData.source, vehicle, plate)
             target.Functions.RemoveMoney('bank', downPayment, 'vehicle-bought-in-showroom')
             player.Functions.AddMoney('bank', commission)
