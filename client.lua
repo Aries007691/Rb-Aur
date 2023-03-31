@@ -989,8 +989,6 @@ CreateThread(function()
             if not DoesEntityExist(playerPed) then return end -- Check if the playerPed is valid
             local pos = GetEntityCoords(playerPed)
             local pickupCoords = vector3(coords.x, coords.y, coords.z)
-            print('pos:', pos)
-            print('pickupCoords:', pickupCoords)
             if Vdist(pos, pickupCoords) < 5 then
                 TriggerEvent('qb-vehicleshop:client:removeblip')
                 TriggerEvent('qb-vehicleshop:client:create_delevery_blip', k, shop)
