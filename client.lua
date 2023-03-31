@@ -955,7 +955,7 @@ local pickupblip = nil
 
 
 RegisterCommand('setstock', function()
-    TriggerServerEvent('qb-stock:server:updatestock')
+    TriggerServerEvent('qb-vehicleshop:server:updatestock')
 end)
 
 RegisterNetEvent('qb-vehicleshop:client:create_blip', function(vehicle)
